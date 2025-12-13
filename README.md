@@ -20,6 +20,5 @@
     ```bash
     npm start
     ```
-    *(Предполагается, что в `package.json` у тебя прописан скрипт `start`. Например: `"scripts": { "start": "node app.js" }`)*
 
 После запуска сервер будет доступен по адресу `http://localhost:3000`.
