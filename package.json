@@ -1,0 +1,22 @@
+{
+  "name": "site-dlya-organizacii-meropriyatiy",
+  "version": "1.0.0",
+  "description": "Сайт для организации мероприятий",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js"
+  },
+  "keywords": [
+    "event",
+    "quiz",
+    "muzikalniy-kviz",
+    "kaif-loto",
+    "guess-the-melody"
+  ],
+  "author": "Максим, Матвей",
+  "license": "MIT",
+  "dependencies": {
+    "better-sqlite3": "^12.5.0",
+    "express": "^4.22.1"
+  }
+}

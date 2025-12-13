@@ -1,0 +1,105 @@
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    line-height: 1.6;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+/* шапка */
+.header {
+    background-color: #333;
+    color: white;
+    padding: 1rem 0;
+    position: sticky; /* Шапка будет прилипать к верху */
+    top: 0;
+    z-index: 1000;
+}
+
+.nav {
+    display: flex;
+    justify-content: space-between; /* Логотип слева, меню справа */
+    align-items: center;
+}
+
+.nav-list {
+    list-style: none;
+    display: flex; /* Горизонтальное меню */
+    gap: 1rem; /* Расстояние между пунктами */
+}
+
+.nav-list a {
+    color: white;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.nav-list a:hover {
+    color: #ccc;
+}
+
+/* бургер меню */
+.burger-menu {
+    display: none; /* Сначала скрыт на больших экранах */
+    flex-direction: column;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0.5rem;
+}
+
+.burger-line {
+    width: 25px;
+    height: 3px;
+    background-color: white;
+    margin: 3px 0;
+    transition: 0.3s;
+}
+
+/* Стили футера (aka подвал) */
+.footer {
+    background-color: #f4f4f4;
+    color: #333;
+    text-align: center;
+    padding: 2rem 0;
+    margin-top: auto; /* Прижимает футер к низу */
+}
+
+/* Адаптивность для мобильных */
+@media (max-width: 768px) {
+    .nav-list {
+        position: fixed; /* меню поверх контента */
+        top: 70px; /* Отступ от шапки */
+        left: -100%; /* Скрываем за левым краем */
+        width: 100%;
+        height: calc(100vh - 70px); /* Занимает всю высоту ниже шапки */
+        background-color: #333;
+        flex-direction: column;
+        align-items: center;
+        justify-content: flex-start;
+        padding-top: 2rem;
+        transition: left 0.3s ease; /* Плавный переход */
+    }
+
+    .nav-list.active {
+        left: 0; /* Показывает меню */
+    }
+
+    .nav-list li {
+        margin-bottom: 1rem;
+    }
+
+    .burger-menu {
+        display: flex; /* Показывает бургер на маленьких экранах */
+    }
+}
