@@ -1,80 +1,77 @@
-// 0. Инициализация БД при старте сервера (вызов init.js)
-// гарантия того, что БД и таблица существуют.
-require('../db/init.js'); // Путь относительно src/server.js
+// --- src/server.js ---
 
-// 1. импорт модуля express
+// Импортируем модули
 const express = require('express');
 const path = require('path');
+const cors = require('cors'); // Импортируем cors
+const Database = require('better-sqlite3'); // Импортируем better-sqlite3
 
-// 2. экземпляр приложения Express
+// Создаём экземпляр приложения
 const app = express();
 
-// 3. Указываем Express, что нужно обслуживать статические файлы из папки 'public'
-// Это значит, что файлы из '/public' будут доступны по корневому URL.
-// Например, http://localhost:3000/index.html -> отдаст public/index.html
-// http://localhost:3000/styles.css -> отдаст public/styles.css
-app.use(express.static('public'));
+// Middleware: CORS
+app.use(cors());
 
-// Парсит тело application/x-www-form-urlencoded (обычная HTML-форма)
+// Middleware: Парсинг тела application/x-www-form-urlencoded
 app.use(express.urlencoded({ extended: true }));
-// Парсит тело application/json (если вдруг фронт будет отправлять JSON)
+// Middleware: Парсинг тела application/json
 app.use(express.json());
 
-// --- Роут для обработки отправки формы ---
-// Ожидаем POST-запрос на /submit
-app.post('/submit', (req, res) => {
-    console.log("Получен POST-запрос на /submit");
-    console.log("Тело запроса (данные формы):", req.body);
+// Middleware: Отдача статических файлов из папки 'public'
+app.use(express.static('public'));
 
-    // Или перенаправить на страницу "Спасибо"
-    res.redirect('/thank-you'); // Перенаправление на страницу благодарности
+// Middleware: Отдача статических файлов из папки 'node_modules' (библиотеки)
+app.use('/node_modules', express.static('node_modules'));
+
+// --- Инициализация БД ---
+// Вызов init.js для создания БД и таблицы (если не существует)
+require('../db/init.js'); // Вызываем init.js при старте сервера
+
+// --- Роуты для страниц ---
+// Роут для главной страницы
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, '../public/index.html'));
 });
 
-// --- Новые роуты для страниц ---
 // Роут для страницы "Форматы"
 app.get('/formats', (req, res) => {
-  // path.join корректно объединяет пути под разные ОС
-  res.sendFile(path.join(__dirname, '../public/formats.html'));
+    res.sendFile(path.join(__dirname, '../public/formats.html'));
 });
 
 // Роут для страницы "Контакты"
 app.get('/contacts', (req, res) => {
-  res.sendFile(path.join(__dirname, '../public/contacts.html'));
+    res.sendFile(path.join(__dirname, '../public/contacts.html'));
 });
-
-// Роут для страницы "Главная" (корневой путь)
-app.get('/home', (req, res) => {
-res.sendFile(path.join(__dirname, '../public/index.html'));});
 
 // Роут для страницы "Как это работает"
 app.get('/how-it-works', (req, res) => {
-  res.sendFile(path.join(__dirname, '../public/how-it-works.html'));
+    res.sendFile(path.join(__dirname, '../public/how-it-works.html'));
 });
 
 // Роут для страницы "Кейсы"
 app.get('/cases', (req, res) => {
-  res.sendFile(path.join(__dirname, '../public/cases.html'));
+    res.sendFile(path.join(__dirname, '../public/cases.html'));
 });
 
 // Роут для страницы "Отзывы"
 app.get('/reviews', (req, res) => {
-  res.sendFile(path.join(__dirname, '../public/reviews.html'));
+    res.sendFile(path.join(__dirname, '../public/reviews.html'));
 });
 
 // Роут для страницы "FAQ"
 app.get('/faq', (req, res) => {
-  res.sendFile(path.join(__dirname, '../public/faq.html'));
+    res.sendFile(path.join(__dirname, '../public/faq.html'));
 });
 
+// Роут для страницы "Спасибо"
+app.get('/thank-you', (req, res) => {
+    res.sendFile(path.join(__dirname, '../public/thank-you.html'));
+});
 
-// 4. порт сервера
-const PORT = process.env.PORT || 3000;
-
-// Импортируем better-sqlite3 и path (если ещё не импортировал в начале файла)
-const Database = require('better-sqlite3');
-
-// Путь к БД (такой же, как в init.js)
-const dbPath = path.resolve(__dirname, '../db/database.sqlite');
+// Роут для страницы "Оставить заявку"
+app.get('/order', (req, res) => {
+    res.sendFile(path.join(__dirname, '../public/order.html'));
+});
 
 // --- Роут для обработки отправки формы ---
 app.post('/submit', (req, res) => {
@@ -93,7 +90,6 @@ app.post('/submit', (req, res) => {
 
     // Проверяем обязательное поле 'phone'
     // Простая проверка: длина > 5 символов и содержит только цифры, плюсы, скобки, тире, пробелы
-    // В реальности паттерн может быть сложнее
     const phoneRegex = /^[\d\s\-\+\(\)]{5,}$/;
     if (!phone || typeof phone !== 'string' || !phoneRegex.test(phone)) {
         errors.push('Некорректный формат телефона.');
@@ -110,18 +106,17 @@ app.post('/submit', (req, res) => {
 
     // --- 2. Запись данных в SQLite ---
     try {
-        // Подключаемся к БД (можно открыть/закрыть соединение для каждого запроса в MVP)
+        // Путь к БД (относительно src/server.js -> ../db/database.sqlite)
+        const dbPath = path.resolve(__dirname, '../db/database.sqlite');
         const db = new Database(dbPath);
 
         // Подготавливаем SQL-запрос для вставки данных
-        // Используем подготовленные выражения (prepared statements) для безопасности
         const stmt = db.prepare(`
             INSERT INTO applications (name, phone, email, format, date, message)
             VALUES (?, ?, ?, ?, ?, ?)
         `);
 
         // Выполняем запрос, передавая значения параметров
-        // req.body может содержать undefined, если поле не было отправлено, это нормально для SQLite
         const info = stmt.run(
             name.trim(), // name
             phone.trim(), // phone
@@ -136,11 +131,9 @@ app.post('/submit', (req, res) => {
         // Закрываем соединение с БД
         db.close();
 
-                // --- 4. Запись в лог-файл (fallback) ---
-        const fs = require('fs'); // Импортируем модуль fs для работы с файлами
-        const path = require('path'); // Уже должен быть импортирован
-
-        // Путь к лог-файлу (лучше положить в папку logs)
+        // --- 3. Запись в лог-файл (fallback) ---
+        const fs = require('fs'); // Импортируем fs для логирования
+        // Путь к лог-файлу (относительно src/server.js -> ../logs/application_logs.txt)
         const logFilePath = path.resolve(__dirname, '../logs/application_logs.txt');
 
         // Формируем строку для лога
@@ -151,11 +144,13 @@ app.post('/submit', (req, res) => {
             fs.appendFileSync(logFilePath, logEntry);
             console.log(`Заявка записана в лог: ${logEntry.trim()}`);
         } catch (logErr) {
-            // Обрабатываем ошибку записи в лог 
+            // Обрабатываем ошибку записи в лог
             console.error("Ошибка при записи в лог-файл:", logErr);
+            // Важно: даже если лог не записался, основная функция (запись в БД) уже выполнена.
+            // Для MVP часто считают успехом и просто логгируем ошибку лога.
         }
 
-        // --- 3. Отправка успешного ответа (переносим сюда) ---
+        // --- 4. Отправка успешного ответа ---
         // Перенаправляем на страницу "Спасибо" после успешной записи в БД и лог
         res.redirect('/thank-you');
 
@@ -168,10 +163,13 @@ app.post('/submit', (req, res) => {
 });
 // --- Конец роута /submit ---
 
-// 5. Запуск сервера
+// Запуск сервера
+const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
     console.log(`Сервер запущен на http://localhost:${PORT}`);
-    console.log(`Он будет отдавать файлы из папки 'public'.`);
+    console.log(`Он будет отдавать файлы из папок 'public' и 'node_modules'.`);
     console.log(`Откройте в браузере: http://localhost:${PORT}`);
 });
 
+// Экспортируем app (если нужно для тестов)
+// module.exports = app;

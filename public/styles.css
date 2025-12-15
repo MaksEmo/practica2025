@@ -1,0 +1,78 @@
+/* Переопределение переменных Bootstrap */
+:root {
+  --bs-primary: #6A0DAD; /* Наш основной цвет */
+  --bs-primary-rgb: 106, 13, 173; /* RGB версия */
+  --bs-primary-bg-subtle: #e0cfff; /* Посветлее */
+  --bs-primary-border-subtle: #c19ff7; /* Оттенок для границ */
+  --bs-dark: #4B0082; /* Наш темный цвет */
+  --bs-body-bg: #1a1a1a; /* Тёмный фон для тёмной темы */
+  --bs-body-color: #e9ecef; /* Светлый цвет текста для тёмной темы */
+}
+
+/* Пример: изменение фона навбара */
+.navbar.bg-dark {
+    background-color: var(--bs-dark) !important;
+}
+
+/* Пример: изменение цвета акцентной кнопки */
+.btn-primary {
+    background-color: var(--bs-primary);
+    border-color: var(--bs-primary);
+}
+
+.btn-primary:hover {
+    background-color: #5a0a93;
+    border-color: #5a0a93;
+}
+
+/* Пример: изменение фона карточек */
+.card.bg-dark {
+    background-color: #212529 !important; /* Немного светлее, чем самый тёмный фон */
+}
+
+/* Дополнительные стили */
+body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+.main {
+    flex: 1;
+}
+
+/* Стили для формы */
+#applicationForm .form-control,
+#applicationForm .form-select {
+    background-color: #343a40; /* Темный фон для полей ввода */
+    color: #e9ecef; /* Светлый текст */
+    border: 1px solid #6c757d; /* Серая граница */
+}
+
+#applicationForm .form-control:focus,
+#applicationForm .form-select:focus {
+    background-color: #343a40;
+    color: #e9ecef;
+    border-color: var(--bs-primary);
+    box-shadow: 0 0 0 0.25rem rgba(106, 13, 173, 0.25); /* Тень при фокусе */
+}
+
+/* Стили для lightbox (если нужно кастомизировать) */
+.lb-data .lb-details {
+    color: white; /* Цвет текста описания в lightbox */
+}
+
+/* Стили для accordion (FAQ) */
+.accordion-button:not(.collapsed) {
+    color: var(--bs-primary);
+    background-color: #343a40; /* Фон заголовка открытого аккордиона */
+}
+
+.accordion-button:focus {
+    border-color: var(--bs-primary);
+    box-shadow: 0 0 0 0.25rem rgba(106, 13, 173, 0.25);
+}
+
+.accordion-item {
+    background-color: #212529; /* Фон элемента аккордиона */
+}
